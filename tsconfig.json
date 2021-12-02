@@ -3,12 +3,24 @@
     "target": "es3",
     "module": "CommonJS",
     "declaration": true,
-    "outDir": "./app/public",
     "lib": ["dom", "dom.iterable", "esnext"],
     "strict": true,
     "moduleResolution": "Node",
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": true,
+    "downlevelIteration": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/__tests__/*"],
