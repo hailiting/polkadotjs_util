@@ -10,12 +10,14 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        loader: "awesome-typescript-loader",
+        loader: "ts-loader",
+        include: path.resolve(__dirname, "src"),
       },
     ],
   },
   resolve: {
     extensions: [".ts", ".js"],
+    fallback: { crypto: false, buffer: false },
   },
   plugins: [
     new HtmlWebpack({

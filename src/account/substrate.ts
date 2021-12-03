@@ -8,6 +8,7 @@ import {
 } from "@polkadot/util-crypto";
 import AccountType from "./constants";
 import { BaseMessage } from "../message/types";
+import { SignerOptions } from "@polkadot/api/submittable/types";
 const a = () => {
   console.log(111);
 };
@@ -114,13 +115,49 @@ export function sign(account: DOTAccount, msg: BaseMessage): BaseMessage {
   throw new Error("could not sign message, signer is invalid");
 }
 
-// https://github.com/logion-network/logion-wallet/blob/d24744be457b38a99b5279f22907653c6f78a2a0/src/logion-chain/Balances.ts
 // https://github.com/figment-networks/learn-web3-dapp/blob/ff05e2bebea47757205692985d85cd987a6c4558/pages/api/polkadot/transfer.ts
 // https://github.com/paritytech/parity-bridges-ui/blob/80fcb34605d1d8cf9a99a52355d1a44246b0bede/src/hooks/api/useApiCalls.ts
 // https://github.com/Joystream/joystream/blob/c38e08f820cd3b7b46fab739a41fa5eac0f6ebd5/tests/network-tests/src/Api.ts
 // https://github.com/meziaris/debio-backend-test/blob/445172251a786a23a3e1bfd31b7b6b09871bb7af/src/substrate/substrate.service.ts
 // 交易
-export async function transfer() {
-  let provider;
+export async function transfer({
+  mnemonic,
+  txAmount,
+  network,
+}: {
+  mnemonic: string;
+  txAmount: string;
+  network: string;
+}) {
+  let provider: WsProvider;
+  try {
+    provider = new WsProvider("wss://rpc.plasmnet.io/");
+    const api = await ApiPromise.create({ provider: provider });
+    const keyring = new Keyring({ type: "sr25519" });
+    const account = keyring.addFromUri(mnemonic);
+
+    const recipient = keyring.addFromUri("//Alice");
+    const recipientAddr = recipient.address;
+    const options: Partial<SignerOptions> = {
+      nonce: -1,
+    };
+
+    const transfer = api.tx.balances.transfer(recipientAddr, txAmount);
+    const hash = await transfer.signAndSend(account, { ...options });
+    await provider.disconnect();
+    return {
+      hash,
+      status: 200,
+    };
+  } catch (error) {
+    if (provider) {
+      await provider.disconnect();
+    }
+    let errorMessage = error instanceof Error ? error.message : "Unknown Error";
+    return {
+      msg: errorMessage,
+      status: 500,
+    };
+  }
 }
 export { a };
