@@ -6,5 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ssss</title>
   </head>
-  <body></body>
+  <body>
+    <button onclick="newAccount()">newAccount</button>
+    <br />
+    <button onclick="importAccount()">importAccount</button>
+    <br />
+    <button
+      onclick="transfer('album vault error twenty dream initial unaware assume burger insane insect orbit','5D52DFvJzAKBTEk1c72Fs6uRYxWLQoRtHC9KKEUVSqPT8U1o',0.1 )"
+    >
+      transfer
+    </button>
+  </body>
+  <script>
+    function newAccount() {
+      console.log(111);
+      (async () => {
+        const a = await window.account.substrate.newAccount();
+        console.log(a);
+        return a;
+      })();
+    }
+    function importAccount(
+      privateKey = undefined,
+      mnemonic = undefined,
+      format = 42,
+      name
+    ) {
+      console.log(2222);
+      (async () => {
+        const a = await window.account.substrate.importAccount(
+          privateKey,
+          mnemonic,
+          format,
+          name
+        );
+        console.log(a);
+        return a;
+      })();
+    }
+    function transfer(mnemonic, recipientAddr, txAmount) {
+      console.log(2222);
+      (async () => {
+        console.log(3333);
+        const a = await window.account.substrate.transfer(
+          mnemonic,
+          recipientAddr,
+          txAmount
+        );
+        console.log(a);
+        return a;
+      })();
+    }
+  </script>
 </html>

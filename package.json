@@ -24,6 +24,7 @@
     "@polkadot/keyring": "^8.0.5",
     "@polkadot/util-crypto": "^8.0.5",
     "awesome-typescript-loader": "^5.2.1",
+    "buffer": "^6.0.3",
     "express": "^4.17.1",
     "html-webpack-plugin": "^5.5.0",
     "ts-loader": "^9.2.6",

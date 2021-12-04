@@ -4,7 +4,7 @@ const webpack = require("webpack");
 const config = require("./config");
 module.exports = {
   mode: "development",
-  entry: "./src/index.ts",
+  entry: ["./src/index.ts"],
 
   module: {
     rules: [
@@ -23,7 +23,7 @@ module.exports = {
     new HtmlWebpack({
       template: "./index.html",
       filename: "index.html",
-      chunks: ["main"],
+      chunks: ["main", "bridge"],
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],

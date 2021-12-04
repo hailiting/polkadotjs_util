@@ -9,6 +9,7 @@ import {
 import AccountType from "./constants";
 import { BaseMessage } from "../message/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
+import { Buffer } from "buffer";
 const a = () => {
   console.log(111);
 };
@@ -120,40 +121,44 @@ export function sign(account: DOTAccount, msg: BaseMessage): BaseMessage {
 // https://github.com/Joystream/joystream/blob/c38e08f820cd3b7b46fab739a41fa5eac0f6ebd5/tests/network-tests/src/Api.ts
 // https://github.com/meziaris/debio-backend-test/blob/445172251a786a23a3e1bfd31b7b6b09871bb7af/src/substrate/substrate.service.ts
 // 交易
-export async function transfer({
-  mnemonic,
-  txAmount,
-  network,
-}: {
-  mnemonic: string;
-  txAmount: string;
-  network: string;
-}) {
+export async function transfer(
+  mnemonic: string,
+  recipientAddr: string,
+  txAmount: string
+) {
+  console.log({ mnemonic, recipientAddr, txAmount });
   let provider: WsProvider;
   try {
-    provider = new WsProvider("wss://rpc.plasmnet.io/");
+    provider = new WsProvider("wss://westend-rpc.polkadot.io/");
     const api = await ApiPromise.create({ provider: provider });
     const keyring = new Keyring({ type: "sr25519" });
     const account = keyring.addFromUri(mnemonic);
-
-    const recipient = keyring.addFromUri("//Alice");
-    const recipientAddr = recipient.address;
+    console.log(111);
     const options: Partial<SignerOptions> = {
       nonce: -1,
     };
-
-    const transfer = api.tx.balances.transfer(recipientAddr, txAmount);
+    const [tokenDecimals] = api.registry.chainDecimals;
+    const transfer = api.tx.balances.transfer(
+      recipientAddr,
+      (Number(txAmount) * Math.pow(10, tokenDecimals)).toString()
+    );
+    console.log(222);
     const hash = await transfer.signAndSend(account, { ...options });
+    console.log(333);
     await provider.disconnect();
+    console.log(444);
     return {
-      hash,
+      hash: hash.toString(),
       status: 200,
     };
   } catch (error) {
+    console.log(555);
     if (provider) {
       await provider.disconnect();
     }
+    console.log(666);
     let errorMessage = error instanceof Error ? error.message : "Unknown Error";
+    console.log(777);
     return {
       msg: errorMessage,
       status: 500,
