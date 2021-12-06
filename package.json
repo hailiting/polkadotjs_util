@@ -6,6 +6,7 @@
   "scripts": {
     "server": "node --loader ts-node/esm src/index.ts",
     "start": "webpack-dev-server --hot --progress --config webpack.config.js",
+    "build": "webpack --config webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

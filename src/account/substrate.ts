@@ -10,9 +10,6 @@ import AccountType from "./constants";
 import { BaseMessage } from "../message/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
 import { Buffer } from "buffer";
-const a = () => {
-  console.log(111);
-};
 
 export type DOTAccount = {
   keyring: Keyring;
@@ -33,12 +30,12 @@ export type DOTAccountImportConfiguration = {
   name?: string;
 };
 // 导入钱包
-export async function importAccount({
+export async function importAccount(
   privateKey = undefined,
   mnemonic = undefined,
-  format = 42,
-  name,
-}: DOTAccountImportConfiguration = {}): Promise<DOTAccount> {
+  format: number,
+  name?: string
+): Promise<DOTAccount> {
   await cryptoWaitReady();
   const keyring = new Keyring({ type: "sr25519", ss58Format: format });
   let pair: KeyringPair | null = null;
@@ -70,14 +67,19 @@ export async function importAccount({
   if (name) {
     account.name = name;
   }
+  if (window.PolkaWallet) {
+    window.PolkaWallet.postMessage(
+      JSON.stringify({
+        account: account,
+        status: 200,
+      })
+    );
+  }
   return account;
 }
 export async function newAccount({ format = 42 } = {}): Promise<DOTAccount> {
   const mnemonic = mnemonicGenerate();
-  return importAccount({
-    mnemonic,
-    format,
-  });
+  return importAccount(mnemonic, undefined, format);
 }
 
 function getVerificationBuffer(msg: BaseMessage) {
@@ -124,29 +126,39 @@ export function sign(account: DOTAccount, msg: BaseMessage): BaseMessage {
 export async function transfer(
   mnemonic: string,
   recipientAddr: string,
-  txAmount: string
+  txAmount: string,
+  tip: string,
+  format: number,
+  wsprovider: string
 ) {
   console.log({ mnemonic, recipientAddr, txAmount });
   let provider: WsProvider;
   try {
-    provider = new WsProvider("wss://westend-rpc.polkadot.io/");
+    // "wss://westend-rpc.polkadot.io/"
+    provider = new WsProvider(wsprovider);
     const api = await ApiPromise.create({ provider: provider });
-    const keyring = new Keyring({ type: "sr25519" });
+    const keyring = new Keyring({ type: "sr25519", ss58Format: format });
     const account = keyring.addFromUri(mnemonic);
     console.log(111);
     const options: Partial<SignerOptions> = {
       nonce: -1,
+      tip: tip,
     };
     const [tokenDecimals] = api.registry.chainDecimals;
     const transfer = api.tx.balances.transfer(
       recipientAddr,
       (Number(txAmount) * Math.pow(10, tokenDecimals)).toString()
     );
-    console.log(222);
     const hash = await transfer.signAndSend(account, { ...options });
-    console.log(333);
     await provider.disconnect();
-    console.log(444);
+    if (window.PolkaWallet) {
+      window.PolkaWallet.postMessage(
+        JSON.stringify({
+          hash: hash.toString(),
+          status: 200,
+        })
+      );
+    }
     return {
       hash: hash.toString(),
       status: 200,
@@ -165,4 +177,3 @@ export async function transfer(
     };
   }
 }
-export { a };

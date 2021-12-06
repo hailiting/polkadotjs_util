@@ -173,6 +173,17 @@
       })();
     }
   );
+
+  WebViewJavascriptBridge.registerHandler(
+    "transfer",
+    function (data, responseCallback) {
+      console.log(11222);
+      (async () => {
+        var res = await window.account.substrate.transfer(...JSON.parse(data));
+        responseCallback(res);
+      })();
+    }
+  );
   // -----end----
 
   var doc = document;

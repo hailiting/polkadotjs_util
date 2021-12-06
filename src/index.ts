@@ -1,7 +1,8 @@
 import account from "./account";
-import "./bridge.js";
+// import "./bridge.js";
 declare global {
   interface Window {
+    PolkaWallet: any;
     account: any;
   }
 }
