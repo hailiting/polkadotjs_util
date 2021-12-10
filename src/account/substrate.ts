@@ -123,29 +123,55 @@ export function sign(account: DOTAccount, msg: BaseMessage): BaseMessage {
 // https://github.com/Joystream/joystream/blob/c38e08f820cd3b7b46fab739a41fa5eac0f6ebd5/tests/network-tests/src/Api.ts
 // https://github.com/meziaris/debio-backend-test/blob/445172251a786a23a3e1bfd31b7b6b09871bb7af/src/substrate/substrate.service.ts
 // 交易
+export async function getApi(wsprovider: string) {
+  if (window.PolkaWalletApi) {
+    return;
+  }
+  let provider: WsProvider;
+  try {
+    provider = new WsProvider(wsprovider);
+    const api = await ApiPromise.create({ provider: provider });
+    console.log("33333");
+    window.PolkaWalletApi = api;
+  } catch (error) {
+    if (provider) {
+      await provider.disconnect();
+    }
+    let errorMessage = error instanceof Error ? error.message : "Unknown Error";
+    return {
+      msg: errorMessage,
+      status: 500,
+    };
+  }
+}
 export async function transfer(
   mnemonic: string,
   recipientAddr: string,
   txAmount: string,
   tip: string,
   format: number,
-  wsprovider: string
+  wsprovider: string,
+  fn?: any
 ) {
-  console.log({ mnemonic, recipientAddr, txAmount });
   let provider: WsProvider;
+
   try {
-    // "wss://westend-rpc.polkadot.io/"
-    provider = new WsProvider(wsprovider);
-    const api = await ApiPromise.create({ provider: provider });
+    if (!window.PolkaWalletApi) {
+      console.log(1111);
+      // "wss://westend-rpc.polkadot.io/"
+      provider = new WsProvider(wsprovider);
+      window.PolkaWalletApi = await ApiPromise.create({ provider: provider });
+    }
     const keyring = new Keyring({ type: "sr25519", ss58Format: format });
+
     const account = keyring.addFromUri(mnemonic);
-    console.log(111);
+
+    const [tokenDecimals] = window.PolkaWalletApi.registry.chainDecimals;
     const options: Partial<SignerOptions> = {
       nonce: -1,
-      tip: tip,
+      tip: (Number(tip) * Math.pow(10, tokenDecimals)).toString(),
     };
-    const [tokenDecimals] = api.registry.chainDecimals;
-    const transfer = api.tx.balances.transfer(
+    const transfer = window.PolkaWalletApi.tx.balances.transfer(
       recipientAddr,
       (Number(txAmount) * Math.pow(10, tokenDecimals)).toString()
     );
@@ -163,14 +189,60 @@ export async function transfer(
       hash: hash.toString(),
       status: 200,
     };
+
+    // const unsub = await transfer.signAndSend(
+    //   account,
+    //   { ...options },
+    //   async ({ status }) => {
+    //     if (status.isReady) {
+    //       console.log("status.isReady: ", status.isReady);
+    //     }
+    //     if (status.isBroadcast) {
+    //       console.log("status.isBroadcast: ", status.isBroadcast);
+    //     }
+    //     if (status.isInBlock) {
+    //       console.log("status.isInBlock: ", status.isInBlock);
+    //       const res = await window.PolkaWalletApi.rpc.chain.getBlock(
+    //         status.asInBlock
+    //       );
+    //       const block = res.block.header.number.toString();
+    //       console.log(block, status.asInBlock.toString());
+    //       if (window.PolkaWallet) {
+    //         window.PolkaWallet.postMessage(
+    //           JSON.stringify({
+    //             data: { block, hash: status.asInBlock.toString() },
+    //             status: 200,
+    //           })
+    //         );
+    //       }
+    //       // if (window.PolkaWallet) {
+    //       //   window.PolkaWallet.postMessage(
+    //       //     JSON.stringify({
+    //       //       hash: hash.toString(),
+    //       //       status: 200,
+    //       //     })
+    //       //   );
+    //       // }
+    //       if (fn) {
+    //         fn(
+    //           JSON.stringify({
+    //             data: { block, hash: status.asInBlock.toString() },
+    //             status: 200,
+    //           })
+    //         );
+    //       }
+    //     }
+    //     if (status.isFinalized) {
+    //       console.log("status.isFinalized: ", status.isFinalized);
+    //       unsub();
+    //     }
+    //   }
+    // );
   } catch (error) {
-    console.log(555);
     if (provider) {
       await provider.disconnect();
     }
-    console.log(666);
     let errorMessage = error instanceof Error ? error.message : "Unknown Error";
-    console.log(777);
     return {
       msg: errorMessage,
       status: 500,

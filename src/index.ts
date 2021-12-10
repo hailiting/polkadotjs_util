@@ -3,6 +3,7 @@ import account from "./account";
 declare global {
   interface Window {
     PolkaWallet: any;
+    PolkaWalletApi: any;
     account: any;
   }
 }

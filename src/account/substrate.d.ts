@@ -25,8 +25,12 @@ export declare function newAccount({ format }?: {
     format?: number;
 }): Promise<DOTAccount>;
 export declare function sign(account: DOTAccount, msg: BaseMessage): BaseMessage;
+export declare function getApi(wsprovider: string): Promise<{
+    msg: string;
+    status: number;
+}>;
 export declare function transfer(mnemonic: string, recipientAddr: string, txAmount: string, tip: string, format: number, wsprovider: string): Promise<{
-    hash: string;
+    hash: any;
     status: number;
     msg?: undefined;
 } | {

@@ -18,6 +18,9 @@
     </button>
   </body>
   <script>
+    setTimeout(function () {
+      window.account.substrate.getApi("wss://westend-rpc.polkadot.io/");
+    }, 1000);
     function newAccount() {
       console.log(111);
       (async () => {
@@ -55,8 +58,8 @@
         const a = await window.account.substrate.transfer(
           "album vault error twenty dream initial unaware assume burger insane insect orbit",
           "1CCfi6sM3jD7iV4Ng1b9CutkmcAKdqJG8P2jhQBgAL9qMKP",
-          "0.1",
-          "3000",
+          "0.01",
+          "0.01",
           0,
           "wss://westend-rpc.polkadot.io/"
         );
