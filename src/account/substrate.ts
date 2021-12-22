@@ -10,7 +10,6 @@ import AccountType from "./constants";
 import { BaseMessage } from "../message/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
 import { Buffer } from "buffer";
-import type { Hash } from "@polkadot/types/interfaces/runtime";
 
 export type DOTAccount = {
   keyring: Keyring;
@@ -175,7 +174,7 @@ export async function transfer(
       recipientAddr,
       (Number(txAmount) * Math.pow(10, tokenDecimals)).toString()
     );
-    return new Promise<Hash>(async (resolve, reject) => {
+    return new Promise<String>(async (resolve, reject) => {
       transfer
         .signAndSend(
           account,
@@ -196,7 +195,12 @@ export async function transfer(
                 })
               );
             }
-            resolve(transfer.hash.toHex());
+            resolve(
+              JSON.stringify({
+                hash: transfer.hash.toHex(),
+                status: 200,
+              })
+            );
             // fn(status.asFinalized.toHex(), transfer.hash.toHex());
           }
         )
