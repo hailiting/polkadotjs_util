@@ -31,20 +31,20 @@ module.exports = {
     path: path.resolve(__dirname, "app/public"),
     filename: "[name].js",
   },
-  devServer: {
-    historyApiFallback: {
-      rewrites: [
-        {
-          from: /.*/,
-          to: path.posix.join(config.dev.assetsPublicPath, "index.html"),
-        },
-      ],
-    },
-    hot: true,
-    compress: true,
-    host: config.dev.host,
-    port: config.dev.port,
-    open: config.dev.autoOpenBrowser,
-    proxy: config.dev.proxyTable,
-  },
+  // devServer: {
+  //   historyApiFallback: {
+  //     rewrites: [
+  //       {
+  //         from: /.*/,
+  //         to: path.posix.join(config.dev.assetsPublicPath, "index.html"),
+  //       },
+  //     ],
+  //   },
+  //   hot: true,
+  //   compress: true,
+  //   host: config.dev.host,
+  //   port: config.dev.port,
+  //   open: config.dev.autoOpenBrowser,
+  //   proxy: config.dev.proxyTable,
+  // },
 };

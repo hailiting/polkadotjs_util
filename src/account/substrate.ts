@@ -10,6 +10,7 @@ import AccountType from "./constants";
 import { BaseMessage } from "../message/types";
 import { SignerOptions } from "@polkadot/api/submittable/types";
 import { Buffer } from "buffer";
+import type { Hash } from "@polkadot/types/interfaces/runtime";
 
 export type DOTAccount = {
   keyring: Keyring;
@@ -174,51 +175,51 @@ export async function transfer(
       recipientAddr,
       (Number(txAmount) * Math.pow(10, tokenDecimals)).toString()
     );
-    const hash = await transfer.signAndSend(account, { ...options });
-    console.log(hash);
-    if (window.PolkaWallet) {
-      window.PolkaWallet.postMessage(
-        JSON.stringify({
-          hash: hash.toString(),
-          status: 200,
-        })
-      );
-    }
-    return {
-      hash: hash.toString(),
-      status: 200,
-    };
+    return new Promise<Hash>(async (resolve, reject) => {
+      transfer
+        .signAndSend(
+          account,
+          {
+            ...options,
+          },
+          ({ status }) => {
+            if (!status.isFinalized) return;
+            if (status.isError) {
+              reject("tx: result.isError");
+              return;
+            }
+            if (window.PolkaWallet) {
+              window.PolkaWallet.postMessage(
+                JSON.stringify({
+                  hash: transfer.hash.toHex(),
+                  status: 200,
+                })
+              );
+            }
+            resolve(transfer.hash.toHex());
+            // fn(status.asFinalized.toHex(), transfer.hash.toHex());
+          }
+        )
+        .catch(() => {
+          reject("tx: failed");
+          return;
+        });
+    });
 
-    // const unsub = await transfer.signAndSend(
-    //   account,
-    //   { ...options },
-    //   async ({ status }) => {
-    //     if (status.isInBlock) {
-    //       const res = await window.PolkaWalletApi.rpc.chain.getBlock(
-    //         status.asInBlock
-    //       );
-    //       const block = res.block.header.number.toString();
-    //       console.log(block, status.asInBlock.toString());
-    //       if (window.PolkaWallet) {
-    //         window.PolkaWallet.postMessage(
-    //           JSON.stringify({
-    //             data: { block, hash: status.asInBlock.toString() },
-    //             status: 200,
-    //           })
-    //         );
-    //       }
-    //       if (fn) {
-    //         fn(
-    //           JSON.stringify({
-    //             data: { block, hash: status.asInBlock.toString() },
-    //             status: 200,
-    //           })
-    //         );
-    //       }
-    //       unsub();
-    //     }
-    //   }
-    // );
+    // const hash = await transfer.signAndSend(account, { ...options });
+    // console.log(hash);
+    // if (window.PolkaWallet) {
+    //   window.PolkaWallet.postMessage(
+    //     JSON.stringify({
+    //       hash: hash.toString(),
+    //       status: 200,
+    //     })
+    //   );
+    // }
+    // return {
+    //   hash: hash.toString(),
+    //   status: 200,
+    // };
   } catch (error) {
     // if (provider) {
     //   await provider.disconnect();

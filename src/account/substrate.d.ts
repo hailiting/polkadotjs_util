@@ -1,7 +1,6 @@
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import AccountType from "./constants";
-import { BaseMessage } from "../message/types";
 export declare type DOTAccount = {
     keyring: Keyring;
     public_key: string;
@@ -14,27 +13,8 @@ export declare type DOTAccount = {
     signer: KeyringPair;
     name: string;
 };
-export declare type DOTAccountImportConfiguration = {
-    privateKey?: string;
-    mnemonic?: string;
-    format?: number;
-    name?: string;
-};
 export declare function importAccount(privateKey: any, mnemonic: any, format: number, name?: string): Promise<DOTAccount>;
-export declare function newAccount({ format }?: {
-    format?: number;
-}): Promise<DOTAccount>;
-export declare function sign(account: DOTAccount, msg: BaseMessage): BaseMessage;
-export declare function getApi(wsprovider: string): Promise<{
-    msg: string;
-    status: number;
-}>;
-export declare function transfer(mnemonic: string, recipientAddr: string, txAmount: string, tip: string, format: number, wsprovider: string, fn?: any): Promise<{
-    hash: any;
-    status: number;
-    msg?: undefined;
-} | {
-    msg: string;
-    status: number;
-    hash?: undefined;
-}>;
+export declare function newAccount(): Promise<string>;
+export declare function sign(): string;
+export declare function getApi(): Promise<string>;
+export declare function transfer(): Promise<string>;

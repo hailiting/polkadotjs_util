@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ssss</title>
-  <script defer src="main.js"></script></head>
+    <script defer src="main.js"></script>
+  </head>
   <body>
     <button onclick="newAccount()">newAccount</button>
     <br />
@@ -18,18 +19,15 @@
     </button>
   </body>
   <script>
-    setTimeout(function () {
-      window.account.substrate.getApi("wss://westend-rpc.polkadot.io/");
-    }, 1000);
+    // setTimeout(function () {
+    //   window.account.substrate.getApi("wss://westend-rpc.polkadot.io/");
+    // }, 1000);
     function newAccount() {
-      console.log(111);
-      (async () => {
-        const a = await window.account.substrate.newAccount();
-        if (window.PolkaWallet) {
-          window.PolkaWallet(a);
-        }
-        return a;
-      })();
+      try {
+        alert("abc: " + window.account.substrate.importAccount);
+      } catch (e) {
+        alert("e: " + e);
+      }
     }
     function importAccount(
       privateKey = undefined,
@@ -38,18 +36,18 @@
       name
     ) {
       console.log(2222);
-      (async () => {
-        const a = await window.account.substrate.importAccount(
-          privateKey,
-          mnemonic,
-          format,
-          name
-        );
-        if (window.PolkaWallet) {
-          window.PolkaWallet(a);
-        }
-        return a;
-      })();
+      // (async () => {
+      //   const a = await window.account.substrate.importAccount(
+      //     privateKey,
+      //     mnemonic,
+      //     format,
+      //     name
+      //   );
+      //   if (window.PolkaWallet) {
+      //     window.PolkaWallet(a);
+      //   }
+      //   return a;
+      // })();
     }
     function transfer(mnemonic, recipientAddr, txAmount) {
       console.log(2222);
