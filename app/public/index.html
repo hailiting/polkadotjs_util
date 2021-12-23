@@ -50,28 +50,27 @@
       // })();
     }
     function transfer(mnemonic, recipientAddr, txAmount) {
-      console.log(2222);
-      (async () => {
-        console.log(3333);
-        const a = await window.account.substrate.transfer(
+      window.account.substrate
+        .transfer(
           "album vault error twenty dream initial unaware assume burger insane insect orbit",
           "1CCfi6sM3jD7iV4Ng1b9CutkmcAKdqJG8P2jhQBgAL9qMKP",
           "0.01",
           "0.01",
           0,
           "wss://westend-rpc.polkadot.io/"
-        );
-        //       mnemonic: string,
-        // recipientAddr: string,
-        // txAmount: string,
-        // tip: string,
-        // wsprovider: string
-        console.log(a);
-        if (window.PolkaWallet) {
-          window.PolkaWallet(a);
-        }
-        return a;
-      })();
+        )
+        .then((a) => {
+          console.log(a);
+          if (window.PolkaWallet) {
+            window.PolkaWallet(a);
+          }
+          return a;
+        });
+      //       mnemonic: string,
+      // recipientAddr: string,
+      // txAmount: string,
+      // tip: string,
+      // wsprovider: string
     }
   </script>
 </html>

@@ -182,25 +182,26 @@ export async function transfer(
             ...options,
           },
           ({ status }) => {
-            if (!status.isFinalized) return;
             if (status.isError) {
               reject("tx: result.isError");
               return;
             }
-            if (window.PolkaWallet) {
-              window.PolkaWallet.postMessage(
+            if (status.isInBlock) {
+              if (window.PolkaWallet) {
+                window.PolkaWallet.postMessage(
+                  JSON.stringify({
+                    hash: transfer.hash.toHex(),
+                    status: 200,
+                  })
+                );
+              }
+              resolve(
                 JSON.stringify({
                   hash: transfer.hash.toHex(),
                   status: 200,
                 })
               );
             }
-            resolve(
-              JSON.stringify({
-                hash: transfer.hash.toHex(),
-                status: 200,
-              })
-            );
             // fn(status.asFinalized.toHex(), transfer.hash.toHex());
           }
         )
